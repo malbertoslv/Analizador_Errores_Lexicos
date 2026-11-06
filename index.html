@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MASL – Analizador de Errores Léxicos | Autómatas I</title>
+  <meta name="description" content="Herramienta interactiva para la práctica de análisis léxico y autómatas finitos. Detecta errores léxicos, clasifica tokens y diferencia entre léxico y sintáctico para Python, JavaScript y C.">
+
+  <!-- Google Fonts: Inter y JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Hoja de Estilos Principal -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236366f1%22 stroke-width=%222%22><polyline points=%224 17 10 11 4 5%22/><line x1=%2212%22 y1=%2219%22 x2=%2220%22 y2=%2219%22/></svg>">
+</head>
+<body>
+
+  <!-- ==========================================
+       CABECERA PRINCIPAL (HEADER COMPACTO)
+       ========================================== -->
+  <header class="masl-header">
+    <div class="masl-container header-container">
+      
+      <!-- Marca y Título -->
+      <div class="brand-section">
+        <div class="brand-logo-badge" title="MASL - Lexer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>
+            MASL <span class="brand-divider">/</span> Analizador Léxico
+            <span class="badge-course">Autómatas I</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Selector de Lenguajes Segmentado (Centro) -->
+      <div class="language-selector-section" role="tablist" aria-label="Seleccionar lenguaje de programación">
+        <div class="lang-tabs" id="language-tabs">
+          <!-- Renderizado dinámicamente por app.js (Python, JavaScript, C) -->
+        </div>
+      </div>
+
+      <!-- Acciones de Utilidad en el Header (Botones de Icono con Tooltips) -->
+      <div class="header-actions">
+        <button class="btn-icon-action" id="run-tests-modal-btn" data-tooltip="Ejecutar pruebas (12)" aria-label="Ejecutar pruebas">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 2v7.31"></path>
+            <path d="M14 9.3V2"></path>
+            <path d="M8.5 2h7"></path>
+            <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+            <path d="M5.52 16h12.96"></path>
+          </svg>
+        </button>
+
+        <button class="btn-icon-action" id="educational-guide-btn" data-tooltip="Guía: ¿Léxico o sintáctico?" aria-label="Guía didáctica">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+        </button>
+
+        <div class="dropdown-wrapper">
+          <button class="btn-icon-action" id="export-menu-btn" data-tooltip="Exportar reporte" aria-label="Exportar reporte">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+          <div class="dropdown-menu" id="export-dropdown-menu">
+            <button class="dropdown-item" id="export-json-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Copiar JSON</span>
+            </button>
+            <button class="dropdown-item" id="export-text-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copiar resumen</span>
+            </button>
+            <button class="dropdown-item" id="download-report-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Descargar .txt</span>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-icon-action" id="theme-toggle-btn" data-tooltip="Modo claro" aria-label="Cambiar tema">
+          <!-- Renderizado dinámicamente por app.js -->
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==========================================
+       BARRA DE ACCIONES UNIFICADA (ALINEADA)
+       ========================================== -->
+  <section class="masl-toolbar">
+    <div class="masl-container toolbar-container">
+      
+      <div class="toolbar-left">
+        <div class="example-select-wrapper">
+          <span class="toolbar-label-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </span>
+          <label for="example-select" class="sr-only">Seleccionar ejemplo</label>
+          <select id="example-select" class="example-select" aria-label="Biblioteca de ejemplos">
+            <option value="" disabled selected>Seleccionar ejemplo...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar-right">
+        <button class="btn-primary-neon" id="analyze-btn" title="Analizar el código escrito (Ctrl + Enter)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>Analizar código</span>
+          <kbd class="shortcut-tag">Ctrl+↵</kbd>
+        </button>
+
+        <button class="btn-secondary" id="clear-btn" title="Limpiar código">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Limpiar</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       ÁREA DE TRABAJO PRINCIPAL (PANTALLA COMPLETA 50% / 50%)
+       ========================================== -->
+  <main class="masl-workspace-wrapper">
+    <div class="masl-container masl-workspace">
+
+      <!-- COLUMNA IZQUIERDA: PANEL DEL EDITOR -->
+      <section class="editor-panel" aria-label="Panel del editor de código">
+        <div class="panel-header">
+          <div class="panel-header-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span class="editor-file-title" id="editor-filename">main.py</span>
+            <span class="dirty-indicator" id="dirty-code-indicator">● Sin analizar</span>
+          </div>
+          <div class="editor-meta-indicators">
+            <span class="cursor-pos-indicator" id="cursor-line-col">Ln 1, Col 1</span>
+            <span class="char-count-indicator" id="cursor-char-count">0 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Banner de Ejemplo Integrado DENTRO del Editor -->
+        <div class="example-description-banner" id="example-description-banner" style="display: none;"></div>
+
+        <!-- Contenedor del Editor Interactivo (flex: 1 con scroll interno) -->
+        <div id="editor-container" class="editor-mount-point"></div>
+
+        <div class="editor-footer-status">
+          <span class="shortcut-hint">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span><kbd>Ctrl+↵</kbd> Analizar • <kbd>Tab</kbd> Indentar (4 esp)</span>
+          </span>
+          <span class="lexer-mode-tag">Autómata Finito / Escáner Léxico</span>
+        </div>
+      </section>
+
+      <!-- COLUMNA DERECHA: PANEL DE RESULTADOS Y DIAGNÓSTICO -->
+      <section class="results-panel" aria-label="Panel de resultados del análisis">
+        
+        <!-- Veredicto Principal Único y Compacto -->
+        <div class="verdict-container" id="verdict-container">
+          <div class="verdict-banner empty-state">
+            <div class="verdict-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </div>
+            <div class="verdict-content">
+              <h4 class="verdict-title">Listo para analizar</h4>
+              <p class="verdict-subtitle">Escribe código en el editor o elige un ejemplo y presiona <strong>"Analizar código"</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta Didáctica Sintáctica (Aparece sólo si se detectan secuencias gramaticales extrañas como 20 + * 5;) -->
+        <div class="syntactic-notice-container" id="syntactic-notice-container" style="display: none;"></div>
+
+        <!-- Pestañas de Resultados (Distribución 4 Columnas, Siempre Caben) -->
+        <nav class="results-tabs-nav" role="tablist" aria-label="Pestañas de resultados">
+          <button class="results-tab-btn active" data-tab="tab-errors" role="tab" aria-selected="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <span>Errores</span>
+            <span class="tab-badge" id="errors-count-badge">0</span>
+          </button>
+
+          <button class="results-tab-btn" data-tab="tab-tokens" role="tab" aria-selected="false">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Tokens</span>
+            <span class="tab-badge" id="tokens-count-badge">0</span>
+          </button>
+
+          <button class="results-tab-btn" data-tab="tab-stats" role="tab" aria-selected="false">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Estadísticas</span>
+          </button>
+
+          <button class="results-tab-btn" data-tab="tab-simulator" role="tab" aria-selected="false">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Paso a paso</span>
+          </button>
+        </nav>
+
+        <!-- PESTAÑA 1: LISTA DE ERRORES LÉXICOS -->
+        <div class="tab-panel active" id="tab-errors" role="tabpanel">
+          <div class="errors-container" id="errors-container">
+            <div class="empty-list-discreet">No se ha ejecutado el análisis aún.</div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 2: TABLA DE TOKENS -->
+        <div class="tab-panel" id="tab-tokens" role="tabpanel">
+          <div class="tokens-table-toolbar">
+            <div class="filter-group">
+              <label for="token-category-filter" class="filter-label">Categoría:</label>
+              <select id="token-category-filter" class="token-filter-select">
+                <option value="ALL">Todas las categorías</option>
+                <option value="PALABRA_RESERVADA">Palabras Reservadas</option>
+                <option value="IDENTIFICADOR">Identificadores</option>
+                <option value="NUMERO_ENTERO">Números Enteros</option>
+                <option value="NUMERO_DECIMAL">Números Decimales</option>
+                <option value="NUMERO_HEXADECIMAL">Hexadecimales</option>
+                <option value="CADENA">Cadenas Literales</option>
+                <option value="CARACTER">Caracteres Literales</option>
+                <option value="OPERADOR">Operadores</option>
+                <option value="DELIMITADOR">Delimitadores</option>
+                <option value="COMENTARIO">Comentarios</option>
+                <option value="DIRECTIVA_PREPROCESADOR">Directivas Preprocesador</option>
+                <option value="ERROR">Errores Léxicos</option>
+              </select>
+            </div>
+
+            <div class="search-group">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="token-search-input" class="token-search-input" placeholder="Filtrar por lexema...">
+            </div>
+          </div>
+
+          <div class="table-responsive-container">
+            <table class="masl-table" id="tokens-table">
+              <thead>
+                <tr>
+                  <th style="width: 44px;">#</th>
+                  <th>Lexema</th>
+                  <th>Categoría</th>
+                  <th style="width: 58px; text-align: center;">Lín</th>
+                  <th style="width: 58px; text-align: center;">Col</th>
+                </tr>
+              </thead>
+              <tbody id="tokens-tbody">
+                <tr>
+                  <td colspan="5" class="empty-table-notice">Presiona "Analizar código" para ver los tokens clasificados.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 3: ESTADÍSTICAS Y MÉTRICAS -->
+        <div class="tab-panel" id="tab-stats" role="tabpanel">
+          <div id="stats-container">
+            <div class="empty-list-discreet">Realiza un análisis para consultar estadísticas.</div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 4: SIMULADOR PASO A PASO -->
+        <div class="tab-panel" id="tab-simulator" role="tabpanel">
+          <div class="sim-hud-card">
+            <div class="sim-hud-header">
+              <span class="sim-hud-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                Lectura Carácter por Carácter
+              </span>
+              <span class="sim-progress-indicator" id="sim-progress-text">Paso 0 de 0</span>
+            </div>
+
+            <div class="sim-progress-bar-track">
+              <div class="sim-progress-bar-inner" id="sim-progress-bar-inner"></div>
+            </div>
+
+            <div class="sim-state-grid">
+              <div class="sim-state-box">
+                <div class="sim-state-label">Estado del Autómata</div>
+                <div class="sim-state-value" id="sim-current-state">q0 (Inicio)</div>
+              </div>
+              <div class="sim-state-box">
+                <div class="sim-state-label">Buffer en Lectura</div>
+                <div class="sim-state-value" id="sim-current-char">Esperando inicio...</div>
+              </div>
+            </div>
+
+            <div class="sim-message-box" id="sim-current-message">
+              Presiona "Reproducir" o "Siguiente" para observar la emisión incremental de tokens.
+            </div>
+          </div>
+
+          <!-- Controles del Reproductor Paso a Paso -->
+          <div class="sim-controls-toolbar">
+            <button class="btn-sim-ctrl" id="sim-prev-btn" title="Paso anterior">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+              <span>Anterior</span>
+            </button>
+            <button class="btn-sim-ctrl primary" id="sim-play-pause-btn" title="Reproducir / Pausar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Reproducir</span>
+            </button>
+            <button class="btn-sim-ctrl" id="sim-next-btn" title="Siguiente paso">
+              <span>Siguiente</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            </button>
+            <button class="btn-sim-ctrl" id="sim-reset-btn" title="Reiniciar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              <span>Reiniciar</span>
+            </button>
+
+            <div class="sim-speed-selector">
+              <label for="sim-speed-select">Velocidad:</label>
+              <select id="sim-speed-select" class="sim-speed-select">
+                <option value="1200">0.5x</option>
+                <option value="600" selected>1.0x</option>
+                <option value="300">2.0x</option>
+                <option value="100">5.0x</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==========================================
+       MODAL: SUITE DE PRUEBAS AUTOMATIZADA
+       ========================================== -->
+  <div class="modal-wrapper" id="test-suite-modal" role="dialog" aria-modal="true" aria-labelledby="test-modal-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="test-modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>
+          <span>Suite de Pruebas Automatizadas</span>
+        </h2>
+        <div style="display: flex; align-items: center; gap: 0.85rem;">
+          <span class="modal-badge badge-success" id="test-summary-badge">12 / 12 Pasadas (100%)</span>
+          <button class="modal-close-btn" aria-label="Cerrar modal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-intro-text">
+          Comprobación exhaustiva de los criterios de aceptación para verificar la corrección del autómata léxico en Python, JavaScript y C:
+        </p>
+        <div class="test-results-container" id="test-results-container">
+          <!-- Renderizado dinámicamente por app.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: GUÍA EDUCATIVA "¿LÉXICO O SINTÁCTICO?"
+       ========================================== -->
+  <div class="modal-wrapper" id="educational-modal" role="dialog" aria-modal="true" aria-labelledby="edu-modal-title">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="edu-modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>Guía Didáctica: Análisis Léxico vs. Análisis Sintáctico</span>
+        </h2>
+        <button class="modal-close-btn" aria-label="Cerrar modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body" id="educational-content-body">
+        <!-- Renderizado dinámicamente por app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts de la Aplicación en orden de dependencia -->
+  <script src="js/languages.js"></script>
+  <script src="js/lexer.js"></script>
+  <script src="js/syntactic-hints.js"></script>
+  <script src="js/examples.js"></script>
+  <script src="js/test-suite.js"></script>
+  <script src="js/step-simulator.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
