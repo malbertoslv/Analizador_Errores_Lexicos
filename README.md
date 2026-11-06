@@ -12,7 +12,19 @@ El analizador toma decisiones formales basadas en la **Teoría de Autómatas y L
 ### 1. Alfabeto de Entrada ($\Sigma$)
 Cada lenguaje posee un conjunto formal de caracteres válidos:
 
-- **Python (Simplificado para Autómatas I):** $\Sigma = \{a..z, A..Z, 0..9, \_, +, -, *, /, \%, =, <, >, !, (, ), [, ], \{, \}, ,, :, ;, ., \#, ', "\}$. El carácter `@` está explícitamente fuera de este alfabeto simplificado (marcado como error léxico `SIMBOLO_NO_PERMITIDO`).
+- **Python (Simplificado para Autómatas I):** el alfabeto Σ está formado por:
+
+| Categoría | Símbolos |
+|---|---|
+| Letras | `a–z`, `A–Z` |
+| Dígitos | `0–9` |
+| Guion bajo | `_` |
+| Operadores | `+` `-` `*` `/` `%` `=` `<` `>` `!` |
+| Delimitadores | `(` `)` `[` `]` `{` `}` `,` `:` `;` `.` |
+| Comentarios y cadenas | `#` `'` `"` |
+| Espacios en blanco | espacio, tabulador y salto de línea |
+
+El carácter `@` está explícitamente fuera de este alfabeto simplificado (marcado como error léxico `SIMBOLO_NO_PERMITIDO`).
   
 - **JavaScript:** $\Sigma$ incluye el símbolo de dólar `$` como carácter válido para identificadores. Símbolos como `@`, `#` (fuera de campos privados) o `¿`, `¡` son clasificados como no pertenecientes al alfabeto.
 
