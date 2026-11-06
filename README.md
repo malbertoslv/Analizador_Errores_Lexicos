@@ -11,8 +11,11 @@ El analizador toma decisiones formales basadas en la **Teoría de Autómatas y L
 
 ### 1. Alfabeto de Entrada ($\Sigma$)
 Cada lenguaje posee un conjunto formal de caracteres válidos:
+
 - **Python (Simplificado para Autómatas I):** $\Sigma = \{a..z, A..Z, 0..9, \_, +, -, *, /, \%, =, <, >, !, (, ), [, ], \{, \}, ,, :, ;, ., \#, ', "\}$. El carácter `@` está explícitamente fuera de este alfabeto simplificado (marcado como error léxico `SIMBOLO_NO_PERMITIDO`).
+  
 - **JavaScript:** $\Sigma$ incluye el símbolo de dólar `$` como carácter válido para identificadores. Símbolos como `@`, `#` (fuera de campos privados) o `¿`, `¡` son clasificados como no pertenecientes al alfabeto.
+
 - **C (ANSI / C99):** El símbolo `$` **NO** es válido para nombres de variables en C estándar. Si el escáner encuentra `$precio`, reporta un error léxico de símbolo prohibido.
 
 ### 2. Reglas de Formación de Tokens
